@@ -1923,6 +1923,8 @@ if [[ $bits = 64bit && $vvenc = y ]] &&
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
     do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON
     do_checkIfExist
+else
+    pc_exists libvvenc || do_removeOption "--enable-libvvenc"
 fi
 
 _check=(bin-video/vvdecapp.exe
@@ -2140,6 +2142,18 @@ if [[ $ffmpeg != no ]]; then
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "$ffmpegPath"; then
         do_changeFFmpegConfig "$license"
+		
+		if [[ $bits = 64bit ]] && enabled_any libvvdec libvvenc; then
+			do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/20231103095720.32426-2-thomas.ff@spin-digital.com/mbox/" am  ||
+			do_removeOptions "--enable-libvvdec --enable-libvvenc"
+			do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/20231103095720.32426-3-thomas.ff@spin-digital.com/mbox/" am  ||
+			do_removeOptions "--enable-libvvdec --enable-libvvenc"
+			do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/20231103095720.32426-4-thomas.ff@spin-digital.com/mbox/" am  ||
+			do_removeOptions "--enable-libvvdec --enable-libvvenc"
+			do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/20231103095720.32426-6-thomas.ff@spin-digital.com/mbox/" am  ||
+			do_removeOptions "--enable-libvvdec --enable-libvvenc"
+		fi
+		
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
         # lavc/cbs_av1: fill in ref_frame_sign_bias
