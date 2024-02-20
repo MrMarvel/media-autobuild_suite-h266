@@ -1936,6 +1936,8 @@ if [[ $bits = 64bit && $vvdec = y ]] &&
     do_uninstall include/vvdec lib/cmake/vvdec "${_check[@]}"
     do_cmakeinstall video -DVVDEC_ENABLE_LINK_TIME_OPT=OFF -DVVDEC_INSTALL_VVDECAPP=ON
     do_checkIfExist
+else
+    pc_exists libvvdec || do_removeOption "--enable-libvvdec"
 fi
 
 _check=(avisynth/avisynth{,_c}.h
@@ -3006,3 +3008,4 @@ fi
 do_simple_print -p "${green}Compilation successful.${reset}"
 do_simple_print -p "${green}This window will close automatically in 5 seconds.${reset}"
 sleep 5
+read
